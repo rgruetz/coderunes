@@ -4,7 +4,7 @@
   "description": "Generate REPO_MAP.md — a token-efficient table of contents of every file's public exports, designed for coding agents.",
   "type": "module",
   "bin": {
-    "coderunes": "./dist/cli.js"
+    "coderunes": "dist/cli.js"
   },
   "exports": {
     ".": {
@@ -32,7 +32,7 @@
     "format:check": "prettier --check .",
     "ci": "npm run format:check && npm run lint && npm run build && npm test && npm run check:map",
     "changeset": "changeset",
-    "version": "changeset version",
+    "version": "changeset version && npm install",
     "release": "npm run build && changeset publish",
     "prepublishOnly": "npm run build"
   },
