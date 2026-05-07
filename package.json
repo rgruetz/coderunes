@@ -26,6 +26,11 @@
     "test": "vitest run",
     "build:map": "node dist/cli.js",
     "check:map": "node dist/cli.js --check",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "ci": "npm run format:check && npm run lint && npm run build && npm test && npm run check:map",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -46,8 +51,13 @@
     "ignore": "^7.0.5"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^25.6.0",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.3",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2",
     "vitest": "^4.1.5"
   }
 }
