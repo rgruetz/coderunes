@@ -49,6 +49,9 @@ jobs:
           # script to push to npm.
           version: npm run version
           publish: npm run release
+          # Tag and create a GitHub Release on each successful npm publish,
+          # using the changelog body as the release notes.
+          createGithubReleases: true
           commit: "chore: release"
           title: "chore: release"
         env:
