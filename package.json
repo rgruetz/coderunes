@@ -25,6 +25,7 @@
     "build": "tsc",
     "test": "vitest run",
     "build:map": "node dist/cli.js",
+    "check:map": "node dist/cli.js --check",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
