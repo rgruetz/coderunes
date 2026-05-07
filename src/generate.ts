@@ -28,6 +28,7 @@ export async function generate(config: ResolvedConfig): Promise<GenerateResult> 
       {
         maxSignatureLength: config.maxSignatureLength,
         includeFileSummary: config.includeFileSummary,
+        signatureMode: config.signatureMode,
       },
       onWarn,
     );

@@ -62,6 +62,7 @@ interface RepoMapConfig {
   ignore?: string[];           // globs. Default: node_modules, dist, build, *.test.*, *.spec.*, *.d.ts
   output?: string;             // default: 'REPO_MAP.md'
   maxSignatureLength?: number; // default: 120. Set to 0 to disable truncation.
+  signatureMode?: "full" | "name"; // default: 'full'. 'name' strips params/bodies for max compactness.
   groupByDirectory?: boolean;  // default: false. When true, adds ## directory headers above ### file headers.
   includeFileSummary?: boolean;// default: false. Pulls top-of-file JSDoc as a one-line description.
   header?: string;             // optional custom header text prepended to the output
@@ -69,6 +70,22 @@ interface RepoMapConfig {
 ```
 
 `.gitignore` is respected automatically (and `.coderunesignore` if present).
+
+### `signatureMode: "name"`
+
+For very large repos where the full map itself becomes a token problem, set `signatureMode: "name"` to strip everything except export kind and identifier:
+
+```markdown
+### src/auth/session.ts
+- `export interface SessionOptions`
+- `export function createSession`
+- `export class SessionStore`
+- `export type SessionId`
+```
+
+Re-exports (`export * from`, `export { x } from`) are kept verbatim because the binding names *are* the navigation signal. Anonymous default exports show a kind hint: short literal values (`export default 42`) are kept as-is; long object/array/expression defaults collapse to `<object>`, `<array>`, or `<expression>` placeholders.
+
+Trade-off: agents lose the ability to pre-decide whether to open a file based on its signatures. Use `"name"` only when the full map is too token-heavy to justify.
 
 ## Output format
 

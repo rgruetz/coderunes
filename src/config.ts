@@ -42,6 +42,7 @@ export async function resolveConfig(opts: {
     ignore: raw.ignore ?? DEFAULT_CONFIG.ignore,
     output: opts.outputOverride ?? raw.output ?? DEFAULT_CONFIG.output,
     maxSignatureLength: raw.maxSignatureLength ?? DEFAULT_CONFIG.maxSignatureLength,
+    signatureMode: raw.signatureMode ?? DEFAULT_CONFIG.signatureMode,
     groupByDirectory: raw.groupByDirectory ?? DEFAULT_CONFIG.groupByDirectory,
     includeFileSummary: raw.includeFileSummary ?? DEFAULT_CONFIG.includeFileSummary,
     header: raw.header ?? DEFAULT_CONFIG.header,
@@ -138,5 +139,8 @@ function validate(c: ResolvedConfig): void {
     throw new Error(
       "config.maxSignatureLength must be 0 (disable truncation) or a number >= 20",
     );
+  }
+  if (c.signatureMode !== "full" && c.signatureMode !== "name") {
+    throw new Error('config.signatureMode must be "full" or "name"');
   }
 }

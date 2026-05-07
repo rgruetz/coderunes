@@ -141,4 +141,37 @@ describe("resolveConfig", () => {
       await rm(dir, { recursive: true, force: true });
     }
   });
+
+  it("defaults signatureMode to full", async () => {
+    const dir = await mkdtemp(path.join(os.tmpdir(), "coderunes-cfg-"));
+    try {
+      const cfg = await resolveConfig({ cwd: dir });
+      expect(cfg.signatureMode).toBe("full");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("accepts signatureMode: name", async () => {
+    const dir = await tmpRepo({
+      "coderunes.config.json": JSON.stringify({ signatureMode: "name" }),
+    });
+    try {
+      const cfg = await resolveConfig({ cwd: dir });
+      expect(cfg.signatureMode).toBe("name");
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects unknown signatureMode values", async () => {
+    const dir = await tmpRepo({
+      "coderunes.config.json": JSON.stringify({ signatureMode: "compact" }),
+    });
+    try {
+      await expect(resolveConfig({ cwd: dir })).rejects.toThrow(/signatureMode/);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
 });

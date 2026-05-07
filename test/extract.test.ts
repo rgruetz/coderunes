@@ -194,6 +194,197 @@ describe("extractFile", () => {
   });
 });
 
+describe("name mode", () => {
+  const nameOpts = {
+    maxSignatureLength: 120,
+    includeFileSummary: false,
+    signatureMode: "name" as const,
+  };
+
+  it("strips function params and return types", async () => {
+    await withTmpFile(
+      "fn.ts",
+      `export function add(a: number, b: number): number { return a + b; }\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export function add"]);
+      },
+    );
+  });
+
+  it("strips async, generics, and return types", async () => {
+    await withTmpFile(
+      "fn.ts",
+      `export async function fetchUser<T>(id: string): Promise<T> { return null as T; }\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export async function fetchUser"]);
+      },
+    );
+  });
+
+  it("strips class extends and bodies", async () => {
+    await withTmpFile(
+      "cls.ts",
+      `export class Foo extends Bar { hello() { return 1; } }\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export class Foo"]);
+      },
+    );
+  });
+
+  it("strips interface bodies", async () => {
+    await withTmpFile(
+      "i.ts",
+      `export interface Session { id: string; userId: string; }\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export interface Session"]);
+      },
+    );
+  });
+
+  it("strips type aliases", async () => {
+    await withTmpFile(
+      "t.ts",
+      `export type Result<T> = { ok: T } | { err: string };\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export type Result"]);
+      },
+    );
+  });
+
+  it("strips const initializers", async () => {
+    await withTmpFile(
+      "c.ts",
+      `export const PI = 3.14159;\nexport const greet = (name: string) => name;\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual([
+          "export const PI",
+          "export const greet",
+        ]);
+      },
+    );
+  });
+
+  it("preserves re-exports verbatim", async () => {
+    await withTmpFile(
+      "re.ts",
+      `export * from "./a.js";\nexport { foo, bar } from "./b.js";\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual([
+          'export * from "./a.js"',
+          'export { foo, bar } from "./b.js"',
+        ]);
+      },
+    );
+  });
+
+  it("named default function: strips params", async () => {
+    await withTmpFile(
+      "d.ts",
+      `export default function noop(): void {}\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export default function noop"]);
+      },
+    );
+  });
+
+  it("anonymous default function shows kind only", async () => {
+    await withTmpFile(
+      "d.ts",
+      `export default function() { return 1; }\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export default function"]);
+      },
+    );
+  });
+
+  it("anonymous default class shows kind only", async () => {
+    await withTmpFile(
+      "d.ts",
+      `export default class { method() {} }\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export default class"]);
+      },
+    );
+  });
+
+  it("short literal default exports keep their value", async () => {
+    await withTmpFile(
+      "d.ts",
+      `export default 42;\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export default 42"]);
+      },
+    );
+  });
+
+  it("short identifier default exports keep their reference", async () => {
+    await withTmpFile(
+      "d.ts",
+      `export default someFunction;\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export default someFunction"]);
+      },
+    );
+  });
+
+  it("short object literal defaults are shown verbatim", async () => {
+    await withTmpFile(
+      "d.ts",
+      `export default { a: 1, b: 2 };\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export default { a: 1, b: 2 }"]);
+      },
+    );
+  });
+
+  it("long object literal defaults collapse to <object>", async () => {
+    const big = "key: 'a very very very very very very very long value'";
+    await withTmpFile(
+      "d.ts",
+      `export default { ${big}, ${big} };\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export default <object>"]);
+      },
+    );
+  });
+
+  it("long array literal defaults collapse to <array>", async () => {
+    await withTmpFile(
+      "d.ts",
+      `export default ["aaaaaaaaaa","bbbbbbbbbbb","cccccccccc","ddddddddd","eeeeeeeeee"];\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export default <array>"]);
+      },
+    );
+  });
+
+  it("long expression defaults collapse to <expression>", async () => {
+    await withTmpFile(
+      "d.ts",
+      `export default someVeryLongIdentifier.deeply.nested.chained.property.access.thing;\n`,
+      async (abs) => {
+        const out = await extractFile(abs, nameOpts, () => {});
+        expect(out.signatures).toEqual(["export default <expression>"]);
+      },
+    );
+  });
+});
+
 describe("extractFileSummary", () => {
   it("returns null when no JSDoc is present", () => {
     expect(extractFileSummary("export const x = 1;\n")).toBeNull();
