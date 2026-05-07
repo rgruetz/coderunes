@@ -1,6 +1,6 @@
 {
   "name": "coderunes",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generate REPO_MAP.md — a token-efficient table of contents of every file's public exports, designed for coding agents.",
   "type": "module",
   "bin": {
