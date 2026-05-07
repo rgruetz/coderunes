@@ -6,7 +6,7 @@ Project context for Claude Code working in this repository.
 
 `coderunes` — a public npm package that generates `REPO_MAP.md` for Node.js repos: a token-efficient table of contents listing every source file's public exports. Designed to be loaded into a coding agent's context as always-on grounding, so the agent navigates by file rather than scanning the codebase.
 
-The original handoff brief lives at `repo-map-package-brief.md` — read it for the full design rationale.
+User-facing docs live in `README.md`; design rationale is captured in code comments and in this file.
 
 ## Layout
 

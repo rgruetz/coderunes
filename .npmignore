@@ -5,5 +5,4 @@ vitest.config.ts
 .gitignore
 *.tsbuildinfo
 coverage/
-repo-map-package-brief.md
 REPO_MAP.md
