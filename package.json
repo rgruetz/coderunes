@@ -4,7 +4,7 @@
   "description": "Generate REPO_MAP.md — a token-efficient table of contents of every file's public exports, designed for coding agents.",
   "type": "module",
   "bin": {
-    "coderunes": "./dist/cli.js"
+    "coderunes": "dist/cli.js"
   },
   "exports": {
     ".": {
