@@ -1,0 +1,52 @@
+{
+  "name": "coderunes",
+  "version": "0.1.0",
+  "description": "Generate REPO_MAP.md — a token-efficient table of contents of every file's public exports, designed for coding agents.",
+  "type": "module",
+  "bin": {
+    "coderunes": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "build:map": "node dist/cli.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "repo-map",
+    "code-map",
+    "ast",
+    "agent",
+    "context",
+    "ai",
+    "claude",
+    "cursor",
+    "llm"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@ast-grep/napi": "^0.42.1",
+    "fast-glob": "^3.3.3",
+    "ignore": "^7.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.5"
+  }
+}

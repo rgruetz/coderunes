@@ -1,0 +1,14 @@
+{
+  "include": ["src/**/*.{ts,tsx,js,jsx,mjs}"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/test/**",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.d.ts"
+  ],
+  "output": "REPO_MAP.md",
+  "maxSignatureLength": 120
+}
