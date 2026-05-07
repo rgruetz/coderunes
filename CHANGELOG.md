@@ -1,5 +1,11 @@
 # coderunes
 
+## 0.1.2
+
+### Patch Changes
+
+- b5aef5c: Fix the CLI silently doing nothing when invoked via the `coderunes` bin. The entry-point check failed through npm's bin symlinks, so `npx coderunes init` and `coderunes --check` ran but never executed `main()`. Replaced with a `realpathSync`-based comparison that handles the symlink correctly.
+
 ## 0.1.1
 
 ### Patch Changes
