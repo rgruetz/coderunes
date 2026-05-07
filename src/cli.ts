@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { writeFile } from "node:fs/promises";
+import { realpathSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { resolveConfig } from "./config.js";
 import { generate } from "./generate.js";
 import { checkAgainstFile } from "./check.js";
@@ -196,10 +198,31 @@ export async function main(argv: string[]): Promise<number> {
   return 0;
 }
 
-// Only run main() when this file is the entry point. Importing as a module
-// (e.g., from tests) leaves main() unevaluated.
-const isCli = import.meta.url === `file://${process.argv[1]}`;
-if (isCli) {
+/**
+ * Returns true when this file is the process entry point (i.e. invoked
+ * directly via `node dist/cli.js` or via the `coderunes` bin), false when
+ * it's been imported as a module (e.g. from tests).
+ *
+ * A naive `import.meta.url === \`file://${process.argv[1]}\`` check fails
+ * for installed copies of the package: npm/npx invokes the bin via a
+ * symlink at `node_modules/.bin/coderunes`, so `process.argv[1]` is the
+ * symlink path while `import.meta.url` is the resolved real path. The
+ * strings never match and `main()` silently never runs. Realpath both
+ * sides so symlinks, relative paths, and Windows drive-letter quirks all
+ * compare correctly.
+ */
+function isMainEntryPoint(): boolean {
+  if (!process.argv[1]) return false;
+  try {
+    const thisFile = realpathSync(fileURLToPath(import.meta.url));
+    const argv1 = realpathSync(process.argv[1]);
+    return thisFile === argv1;
+  } catch {
+    return false;
+  }
+}
+
+if (isMainEntryPoint()) {
   main(process.argv.slice(2))
     .then((code) => process.exit(code))
     .catch((err) => {
