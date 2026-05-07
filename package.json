@@ -45,6 +45,14 @@
     "llm"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rgruetz/coderunes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rgruetz/coderunes/issues"
+  },
+  "homepage": "https://github.com/rgruetz/coderunes#readme",
   "dependencies": {
     "@ast-grep/napi": "^0.42.1",
     "fast-glob": "^3.3.3",
