@@ -39,9 +39,7 @@ describe("extractFile", () => {
       `export interface Point {\n  x: number;\n  y: number;\n}\n`,
       async (abs) => {
         const out = await extractFile(abs, opts, () => {});
-        expect(out.signatures).toEqual([
-          "export interface Point { x: number; y: number; }",
-        ]);
+        expect(out.signatures).toEqual(["export interface Point { x: number; y: number; }"]);
       },
     );
   });
@@ -53,7 +51,7 @@ describe("extractFile", () => {
       async (abs) => {
         const out = await extractFile(abs, opts, () => {});
         expect(out.signatures).toEqual([
-          'export type Result = { ok: true } | { ok: false; reason: string }',
+          "export type Result = { ok: true } | { ok: false; reason: string }",
         ]);
       },
     );
@@ -87,36 +85,28 @@ describe("extractFile", () => {
 
   it("truncates very long signatures with an ellipsis", async () => {
     const long = "a".repeat(200);
-    await withTmpFile(
-      "long.ts",
-      `export function fn(x: ${long}): void {}\n`,
-      async (abs) => {
-        const out = await extractFile(abs, opts, () => {});
-        expect(out.signatures.length).toBe(1);
-        const sig = out.signatures[0]!;
-        expect(sig.length).toBeLessThanOrEqual(120);
-        expect(sig.endsWith("…")).toBe(true);
-      },
-    );
+    await withTmpFile("long.ts", `export function fn(x: ${long}): void {}\n`, async (abs) => {
+      const out = await extractFile(abs, opts, () => {});
+      expect(out.signatures.length).toBe(1);
+      const sig = out.signatures[0]!;
+      expect(sig.length).toBeLessThanOrEqual(120);
+      expect(sig.endsWith("…")).toBe(true);
+    });
   });
 
   it("does not truncate when maxSignatureLength is 0", async () => {
     const long = "a".repeat(200);
-    await withTmpFile(
-      "long.ts",
-      `export function fn(x: ${long}): void {}\n`,
-      async (abs) => {
-        const out = await extractFile(
-          abs,
-          { maxSignatureLength: 0, includeFileSummary: false },
-          () => {},
-        );
-        expect(out.signatures.length).toBe(1);
-        const sig = out.signatures[0]!;
-        expect(sig.endsWith("…")).toBe(false);
-        expect(sig.length).toBeGreaterThan(200);
-      },
-    );
+    await withTmpFile("long.ts", `export function fn(x: ${long}): void {}\n`, async (abs) => {
+      const out = await extractFile(
+        abs,
+        { maxSignatureLength: 0, includeFileSummary: false },
+        () => {},
+      );
+      expect(out.signatures.length).toBe(1);
+      const sig = out.signatures[0]!;
+      expect(sig.endsWith("…")).toBe(false);
+      expect(sig.length).toBeGreaterThan(200);
+    });
   });
 
   it("cuts arrow function bodies", async () => {
@@ -131,14 +121,10 @@ describe("extractFile", () => {
   });
 
   it("handles export default function", async () => {
-    await withTmpFile(
-      "def.ts",
-      `export default function noop(): void {}\n`,
-      async (abs) => {
-        const out = await extractFile(abs, opts, () => {});
-        expect(out.signatures).toEqual(["export default function noop(): void"]);
-      },
-    );
+    await withTmpFile("def.ts", `export default function noop(): void {}\n`, async (abs) => {
+      const out = await extractFile(abs, opts, () => {});
+      expect(out.signatures).toEqual(["export default function noop(): void"]);
+    });
   });
 
   it("does not crash on broken syntax", async () => {
@@ -154,14 +140,10 @@ describe("extractFile", () => {
   });
 
   it("returns empty for files with no exports", async () => {
-    await withTmpFile(
-      "empty.ts",
-      `const x = 1;\nconsole.log(x);\n`,
-      async (abs) => {
-        const out = await extractFile(abs, opts, () => {});
-        expect(out.signatures).toEqual([]);
-      },
-    );
+    await withTmpFile("empty.ts", `const x = 1;\nconsole.log(x);\n`, async (abs) => {
+      const out = await extractFile(abs, opts, () => {});
+      expect(out.signatures).toEqual([]);
+    });
   });
 
   it("handles JSX/TSX with React-style components", async () => {
@@ -184,9 +166,7 @@ describe("extractFile", () => {
       `export interface C {\n  /** the path */\n  path: string;\n  /** the count */\n  count: number;\n}\n`,
       async (abs) => {
         const out = await extractFile(abs, opts, () => {});
-        expect(out.signatures).toEqual([
-          "export interface C { path: string; count: number; }",
-        ]);
+        expect(out.signatures).toEqual(["export interface C { path: string; count: number; }"]);
       },
     );
   });
@@ -288,10 +268,7 @@ describe("name mode", () => {
       `export const PI = 3.14159;\nexport const greet = (name: string) => name;\n`,
       async (abs) => {
         const out = await extractFile(abs, nameOpts, () => {});
-        expect(out.signatures).toEqual([
-          "export const PI",
-          "export const greet",
-        ]);
+        expect(out.signatures).toEqual(["export const PI", "export const greet"]);
       },
     );
   });
@@ -311,81 +288,53 @@ describe("name mode", () => {
   });
 
   it("named default function: strips params", async () => {
-    await withTmpFile(
-      "d.ts",
-      `export default function noop(): void {}\n`,
-      async (abs) => {
-        const out = await extractFile(abs, nameOpts, () => {});
-        expect(out.signatures).toEqual(["export default function noop"]);
-      },
-    );
+    await withTmpFile("d.ts", `export default function noop(): void {}\n`, async (abs) => {
+      const out = await extractFile(abs, nameOpts, () => {});
+      expect(out.signatures).toEqual(["export default function noop"]);
+    });
   });
 
   it("anonymous default function shows kind only", async () => {
-    await withTmpFile(
-      "d.ts",
-      `export default function() { return 1; }\n`,
-      async (abs) => {
-        const out = await extractFile(abs, nameOpts, () => {});
-        expect(out.signatures).toEqual(["export default function"]);
-      },
-    );
+    await withTmpFile("d.ts", `export default function() { return 1; }\n`, async (abs) => {
+      const out = await extractFile(abs, nameOpts, () => {});
+      expect(out.signatures).toEqual(["export default function"]);
+    });
   });
 
   it("anonymous default class shows kind only", async () => {
-    await withTmpFile(
-      "d.ts",
-      `export default class { method() {} }\n`,
-      async (abs) => {
-        const out = await extractFile(abs, nameOpts, () => {});
-        expect(out.signatures).toEqual(["export default class"]);
-      },
-    );
+    await withTmpFile("d.ts", `export default class { method() {} }\n`, async (abs) => {
+      const out = await extractFile(abs, nameOpts, () => {});
+      expect(out.signatures).toEqual(["export default class"]);
+    });
   });
 
   it("short literal default exports keep their value", async () => {
-    await withTmpFile(
-      "d.ts",
-      `export default 42;\n`,
-      async (abs) => {
-        const out = await extractFile(abs, nameOpts, () => {});
-        expect(out.signatures).toEqual(["export default 42"]);
-      },
-    );
+    await withTmpFile("d.ts", `export default 42;\n`, async (abs) => {
+      const out = await extractFile(abs, nameOpts, () => {});
+      expect(out.signatures).toEqual(["export default 42"]);
+    });
   });
 
   it("short identifier default exports keep their reference", async () => {
-    await withTmpFile(
-      "d.ts",
-      `export default someFunction;\n`,
-      async (abs) => {
-        const out = await extractFile(abs, nameOpts, () => {});
-        expect(out.signatures).toEqual(["export default someFunction"]);
-      },
-    );
+    await withTmpFile("d.ts", `export default someFunction;\n`, async (abs) => {
+      const out = await extractFile(abs, nameOpts, () => {});
+      expect(out.signatures).toEqual(["export default someFunction"]);
+    });
   });
 
   it("short object literal defaults are shown verbatim", async () => {
-    await withTmpFile(
-      "d.ts",
-      `export default { a: 1, b: 2 };\n`,
-      async (abs) => {
-        const out = await extractFile(abs, nameOpts, () => {});
-        expect(out.signatures).toEqual(["export default { a: 1, b: 2 }"]);
-      },
-    );
+    await withTmpFile("d.ts", `export default { a: 1, b: 2 };\n`, async (abs) => {
+      const out = await extractFile(abs, nameOpts, () => {});
+      expect(out.signatures).toEqual(["export default { a: 1, b: 2 }"]);
+    });
   });
 
   it("long object literal defaults collapse to <object>", async () => {
     const big = "key: 'a very very very very very very very long value'";
-    await withTmpFile(
-      "d.ts",
-      `export default { ${big}, ${big} };\n`,
-      async (abs) => {
-        const out = await extractFile(abs, nameOpts, () => {});
-        expect(out.signatures).toEqual(["export default <object>"]);
-      },
-    );
+    await withTmpFile("d.ts", `export default { ${big}, ${big} };\n`, async (abs) => {
+      const out = await extractFile(abs, nameOpts, () => {});
+      expect(out.signatures).toEqual(["export default <object>"]);
+    });
   });
 
   it("long array literal defaults collapse to <array>", async () => {
@@ -417,9 +366,7 @@ describe("extractFileSummary", () => {
   });
 
   it("ignores @-tag-only JSDoc lines", () => {
-    expect(
-      extractFileSummary("/**\n * @internal\n */\nexport const x = 1;\n"),
-    ).toBeNull();
+    expect(extractFileSummary("/**\n * @internal\n */\nexport const x = 1;\n")).toBeNull();
   });
 
   it("picks the first non-tag line", () => {

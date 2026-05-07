@@ -31,17 +31,17 @@ None fit. The script is small enough that owning it ourselves is the right call.
 
 ## Design decisions (with rationale)
 
-| Decision | Rationale |
-|---|---|
-| Use `@ast-grep/napi` for parsing | Tree-sitter-based, ships prebuilt binaries (no native build), supports JS/TS/TSX, fast. Considered `ts-morph` — too heavy and TS-only. Considered regex — too fragile. |
-| Output a single `REPO_MAP.md` at repo root | One file is easy for agents to discover and reference from `AGENTS.md`. Per-package maps in monorepos are a v2 feature. |
-| Group entries by file path, not by symbol | Agents navigate by file. File path is the primary key. |
-| Show signature only, cut function/class bodies at first `{` | Bodies are noise at the map level. Keep types/interfaces intact (they have no body). |
-| Truncate signatures to 120 chars | Generic-heavy TS signatures can sprawl. Cap keeps the map scannable. |
-| Configurable include/ignore globs | Every project has its own layout (`src/`, `lib/`, `packages/*/src/`). |
-| Per-project `repo-map.config.{js,json,mjs}` | Standard pattern (eslint, prettier). Discovered from `cwd` upward. |
-| `--check` flag for CI | Each repo wires CI to fail if the map is stale, without duplicating logic. |
-| Semver-pinned per-project | Output format changes don't break every repo simultaneously. |
+| Decision                                                    | Rationale                                                                                                                                                              |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Use `@ast-grep/napi` for parsing                            | Tree-sitter-based, ships prebuilt binaries (no native build), supports JS/TS/TSX, fast. Considered `ts-morph` — too heavy and TS-only. Considered regex — too fragile. |
+| Output a single `REPO_MAP.md` at repo root                  | One file is easy for agents to discover and reference from `AGENTS.md`. Per-package maps in monorepos are a v2 feature.                                                |
+| Group entries by file path, not by symbol                   | Agents navigate by file. File path is the primary key.                                                                                                                 |
+| Show signature only, cut function/class bodies at first `{` | Bodies are noise at the map level. Keep types/interfaces intact (they have no body).                                                                                   |
+| Truncate signatures to 120 chars                            | Generic-heavy TS signatures can sprawl. Cap keeps the map scannable.                                                                                                   |
+| Configurable include/ignore globs                           | Every project has its own layout (`src/`, `lib/`, `packages/*/src/`).                                                                                                  |
+| Per-project `repo-map.config.{js,json,mjs}`                 | Standard pattern (eslint, prettier). Discovered from `cwd` upward.                                                                                                     |
+| `--check` flag for CI                                       | Each repo wires CI to fail if the map is stale, without duplicating logic.                                                                                             |
+| Semver-pinned per-project                                   | Output format changes don't break every repo simultaneously.                                                                                                           |
 
 ## Package requirements
 
@@ -63,13 +63,13 @@ Resolution order: `--config` flag → `repo-map.config.js` → `repo-map.config.
 
 ```ts
 interface RepoMapConfig {
-  include?: string[];          // glob patterns. Default: ['src/**/*.{ts,tsx,js,jsx,mjs}']
-  ignore?: string[];           // glob patterns. Default: node_modules, dist, build, *.test.*, *.spec.*, *.d.ts
-  output?: string;             // default: 'REPO_MAP.md'
+  include?: string[]; // glob patterns. Default: ['src/**/*.{ts,tsx,js,jsx,mjs}']
+  ignore?: string[]; // glob patterns. Default: node_modules, dist, build, *.test.*, *.spec.*, *.d.ts
+  output?: string; // default: 'REPO_MAP.md'
   maxSignatureLength?: number; // default: 120
-  groupByDirectory?: boolean;  // default: false (v1). When true, adds ## directory headers above ### file headers.
-  includeFileSummary?: boolean;// default: false. When true, pulls top-of-file JSDoc as one-line description.
-  header?: string;             // optional custom header text prepended to the output
+  groupByDirectory?: boolean; // default: false (v1). When true, adds ## directory headers above ### file headers.
+  includeFileSummary?: boolean; // default: false. When true, pulls top-of-file JSDoc as one-line description.
+  header?: string; // optional custom header text prepended to the output
 }
 ```
 
@@ -81,11 +81,13 @@ interface RepoMapConfig {
 _Auto-generated by @yourorg/repo-map. Do not edit. Run `npm run build:map` to refresh._
 
 ### src/auth/session.ts
+
 - `export function createSession(userId: string): Session`
 - `export class SessionStore`
 - `export interface SessionOptions`
 
 ### src/auth/middleware.ts
+
 - `export function requireAuth(req: Request, res: Response, next: NextFunction)`
 ```
 
@@ -93,7 +95,9 @@ When `includeFileSummary: true`:
 
 ```markdown
 ### src/auth/session.ts
+
 _Session creation and persistence backed by Redis._
+
 - `export function createSession(userId: string): Session`
 ```
 
@@ -111,45 +115,45 @@ _Session creation and persistence backed by Redis._
 This is the working prototype. Use it as a starting point — package it up, generalize the hardcoded values into config, add the CLI shell, and write tests.
 
 ```js
-import { parse, Lang } from '@ast-grep/napi';
-import { readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
-import fg from 'fast-glob';
+import { parse, Lang } from "@ast-grep/napi";
+import { readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
+import fg from "fast-glob";
 
 const ROOT = process.cwd();
-const OUT = 'REPO_MAP.md';
+const OUT = "REPO_MAP.md";
 const MAX_LINE = 120;
 
-const INCLUDE = ['src/**/*.{ts,tsx,js,jsx,mjs}'];
+const INCLUDE = ["src/**/*.{ts,tsx,js,jsx,mjs}"];
 const IGNORE = [
-  '**/node_modules/**',
-  '**/dist/**',
-  '**/build/**',
-  '**/*.test.*',
-  '**/*.spec.*',
-  '**/*.d.ts',
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/build/**",
+  "**/*.test.*",
+  "**/*.spec.*",
+  "**/*.d.ts",
 ];
 
 function langFor(file) {
-  if (file.endsWith('.tsx')) return Lang.Tsx;
-  if (file.endsWith('.ts')) return Lang.TypeScript;
-  if (file.endsWith('.jsx')) return Lang.Tsx;
+  if (file.endsWith(".tsx")) return Lang.Tsx;
+  if (file.endsWith(".ts")) return Lang.TypeScript;
+  if (file.endsWith(".jsx")) return Lang.Tsx;
   return Lang.JavaScript;
 }
 
 function toSignature(node) {
   let text = node.text();
-  const brace = text.indexOf('{');
+  const brace = text.indexOf("{");
   const isTypeLike = /^export\s+(type|interface)\b/.test(text);
   if (brace > -1 && !isTypeLike) text = text.slice(0, brace).trim();
-  text = text.split('\n')[0].trim().replace(/\s+/g, ' ');
-  return text.length > MAX_LINE ? text.slice(0, MAX_LINE - 1) + '…' : text;
+  text = text.split("\n")[0].trim().replace(/\s+/g, " ");
+  return text.length > MAX_LINE ? text.slice(0, MAX_LINE - 1) + "…" : text;
 }
 
 async function extractExports(file) {
-  const source = await readFile(file, 'utf8');
+  const source = await readFile(file, "utf8");
   const root = parse(langFor(file), source).root();
-  const nodes = root.findAll({ rule: { kind: 'export_statement' } });
+  const nodes = root.findAll({ rule: { kind: "export_statement" } });
   return nodes.map(toSignature).filter(Boolean);
 }
 
@@ -158,10 +162,10 @@ async function main() {
   files.sort();
 
   const out = [
-    '# Repo Map',
-    '',
-    '_Auto-generated. Do not edit by hand. Run `npm run build:map` to refresh._',
-    '',
+    "# Repo Map",
+    "",
+    "_Auto-generated. Do not edit by hand. Run `npm run build:map` to refresh._",
+    "",
   ];
 
   for (const rel of files) {
@@ -169,13 +173,16 @@ async function main() {
     if (!sigs.length) continue;
     out.push(`### ${rel}`);
     for (const sig of sigs) out.push(`- \`${sig}\``);
-    out.push('');
+    out.push("");
   }
 
-  await writeFile(OUT, out.join('\n'));
+  await writeFile(OUT, out.join("\n"));
 }
 
-main().catch((err) => { console.error(err); process.exit(1); });
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
 ```
 
 ## Suggested package layout

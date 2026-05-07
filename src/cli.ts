@@ -94,7 +94,7 @@ async function readPkgVersion(): Promise<string> {
     const pkgPath = path.resolve(here, "..", "package.json");
     const { readFile } = await import("node:fs/promises");
     const text = await readFile(pkgPath, "utf8");
-    const pkg = JSON.parse(text);
+    const pkg = JSON.parse(text) as { version?: unknown };
     return typeof pkg.version === "string" ? pkg.version : "0.0.0";
   } catch {
     return "0.0.0";

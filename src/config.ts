@@ -111,8 +111,8 @@ async function findConfigFile(cwd: string): Promise<string | null> {
 async function loadConfigFile(absPath: string): Promise<RepoMapConfig> {
   if (absPath.endsWith(".json")) {
     const text = await readFile(absPath, "utf8");
-    const parsed = JSON.parse(text);
-    if (parsed && typeof parsed === "object") return parsed as RepoMapConfig;
+    const parsed: unknown = JSON.parse(text);
+    if (parsed && typeof parsed === "object") return parsed;
     throw new Error(`config at ${absPath} is not an object`);
   }
 
@@ -125,7 +125,7 @@ async function loadConfigFile(absPath: string): Promise<RepoMapConfig> {
     throw new Error(`config at ${absPath} did not export an object`);
   }
 
-  return config as RepoMapConfig;
+  return config;
 }
 
 interface PackageJsonHit {
@@ -148,10 +148,10 @@ async function loadFromPackageJson(cwd: string): Promise<PackageJsonHit | null> 
     if (await fileExists(candidate)) {
       const text = await readFile(candidate, "utf8");
       try {
-        const pkg = JSON.parse(text);
-        const cfg = pkg?.coderunes;
+        const pkg = JSON.parse(text) as { coderunes?: unknown };
+        const cfg = pkg.coderunes;
         if (cfg && typeof cfg === "object") {
-          return { config: cfg as RepoMapConfig, path: candidate };
+          return { config: cfg, path: candidate };
         }
       } catch {
         // Malformed package.json — skip silently. We don't want to hard-fail
@@ -201,9 +201,7 @@ function validate(c: ResolvedConfig): void {
   // a typo, so we reject it explicitly.
   const m = c.maxSignatureLength;
   if (typeof m !== "number" || !Number.isFinite(m) || (m !== 0 && m < 20)) {
-    throw new Error(
-      "config.maxSignatureLength must be 0 (disable truncation) or a number >= 20",
-    );
+    throw new Error("config.maxSignatureLength must be 0 (disable truncation) or a number >= 20");
   }
 
   if (c.signatureMode !== "full" && c.signatureMode !== "name") {

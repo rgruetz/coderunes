@@ -64,18 +64,19 @@ export async function runInit(cwd: string): Promise<InitResult> {
   if (await fileExists(pkgPath)) {
     resolvedPkgPath = pkgPath;
     const text = await readFile(pkgPath, "utf8");
-    const pkg = JSON.parse(text);
+    const pkg = JSON.parse(text) as { scripts?: Record<string, string> } & Record<string, unknown>;
 
-    pkg.scripts ??= {};
+    const scripts: Record<string, string> = pkg.scripts ?? {};
+    pkg.scripts = scripts;
 
     // Add scripts only when not already defined — never overwrite a custom
     // script with our default, and never silently change user behavior.
-    if (!pkg.scripts["build:map"]) {
-      pkg.scripts["build:map"] = "coderunes";
+    if (!scripts["build:map"]) {
+      scripts["build:map"] = "coderunes";
       scriptAdded = true;
     }
-    if (!pkg.scripts["check:map"]) {
-      pkg.scripts["check:map"] = "coderunes --check";
+    if (!scripts["check:map"]) {
+      scripts["check:map"] = "coderunes --check";
       scriptAdded = true;
     }
 

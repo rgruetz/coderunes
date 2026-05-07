@@ -31,9 +31,7 @@ export async function discoverFiles(opts: {
   // Layer .gitignore filtering on top of fast-glob's `ignore` option.
   // fast-glob doesn't parse .gitignore natively, so we apply it ourselves.
   const gitignored = await loadGitignore(opts.cwd);
-  const filtered = gitignored
-    ? matched.filter((rel) => !gitignored.ignores(rel))
-    : matched;
+  const filtered = gitignored ? matched.filter((rel) => !gitignored.ignores(rel)) : matched;
 
   return filtered.sort();
 }

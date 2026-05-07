@@ -23,10 +23,5 @@ export type { CheckOutcome } from "./check.js";
 
 export { runInit } from "./init.js";
 
-export type {
-  RepoMapConfig,
-  ResolvedConfig,
-  FileEntry,
-  SignatureMode,
-} from "./types.js";
+export type { RepoMapConfig, ResolvedConfig, FileEntry, SignatureMode } from "./types.js";
 export { DEFAULT_CONFIG } from "./types.js";

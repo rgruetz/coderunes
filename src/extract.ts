@@ -10,11 +10,7 @@ import type { SignatureMode } from "./types.js";
  * implementation noise. Cutting at the start of these nodes turns
  * `function foo(a): R { ... }` into `function foo(a): R`.
  */
-const BODY_KINDS = new Set([
-  "statement_block",
-  "class_body",
-  "enum_body",
-]);
+const BODY_KINDS = new Set(["statement_block", "class_body", "enum_body"]);
 
 /**
  * Re-export forms (`export *`, `export { ... }`, `export type { ... }`).
@@ -167,11 +163,7 @@ function normalize(text: string, maxLen: number): string {
  * In both modes, re-exports are rendered verbatim because the binding names
  * are the navigationally interesting part.
  */
-export function toSignature(
-  node: SgNode,
-  maxLen: number,
-  mode: SignatureMode = "full",
-): string {
+export function toSignature(node: SgNode, maxLen: number, mode: SignatureMode = "full"): string {
   const text = node.text().trim();
 
   if (mode === "name") {
@@ -336,9 +328,7 @@ export async function extractFile(
       const sig = toSignature(node, opts.maxSignatureLength, mode);
       if (sig) signatures.push(sig);
     } catch (err) {
-      onWarn(
-        `coderunes: signature error in ${absPath}: ${(err as Error).message}`,
-      );
+      onWarn(`coderunes: signature error in ${absPath}: ${(err as Error).message}`);
     }
   }
 

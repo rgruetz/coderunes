@@ -15,7 +15,7 @@ describe("runInit", () => {
       const result = await runInit(dir);
       expect(result.configCreated).toBe(true);
       const text = await readFile(result.configPath, "utf8");
-      expect(text).toContain("\"include\"");
+      expect(text).toContain('"include"');
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
@@ -25,7 +25,7 @@ describe("runInit", () => {
     const dir = await tmpDir();
     try {
       const cfgPath = path.join(dir, "coderunes.config.json");
-      await writeFile(cfgPath, "{\"include\":[\"untouched/**\"]}");
+      await writeFile(cfgPath, '{"include":["untouched/**"]}');
       const result = await runInit(dir);
       expect(result.configCreated).toBe(false);
       const text = await readFile(cfgPath, "utf8");
