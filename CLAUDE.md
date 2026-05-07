@@ -30,17 +30,17 @@ test/
 
 ## Commands
 
-| Command              | What it does                                                            |
-| -------------------- | ----------------------------------------------------------------------- |
-| `npm run build`      | Compile `src/` → `dist/` via `tsc`                                      |
-| `npm test`           | Run vitest suite                                                        |
-| `npm run lint`       | ESLint (typescript-eslint recommendedTypeChecked)                       |
-| `npm run lint:fix`   | ESLint with autofix                                                     |
-| `npm run format`     | Prettier write                                                          |
-| `npm run format:check` | Prettier check (CI mode)                                              |
-| `npm run build:map`  | Regenerate this repo's own `REPO_MAP.md` (runs `node dist/cli.js`)      |
-| `npm run check:map`  | Verify `REPO_MAP.md` is up to date (CI mode, exits 2 if stale)          |
-| `npm run ci`         | format:check + lint + build + test + check:map (full pre-push gauntlet) |
+| Command                | What it does                                                            |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `npm run build`        | Compile `src/` → `dist/` via `tsc`                                      |
+| `npm test`             | Run vitest suite                                                        |
+| `npm run lint`         | ESLint (typescript-eslint recommendedTypeChecked)                       |
+| `npm run lint:fix`     | ESLint with autofix                                                     |
+| `npm run format`       | Prettier write                                                          |
+| `npm run format:check` | Prettier check (CI mode)                                                |
+| `npm run build:map`    | Regenerate this repo's own `REPO_MAP.md` (runs `node dist/cli.js`)      |
+| `npm run check:map`    | Verify `REPO_MAP.md` is up to date (CI mode, exits 2 if stale)          |
+| `npm run ci`           | format:check + lint + build + test + check:map (full pre-push gauntlet) |
 
 In this repo we invoke the CLI as `node dist/cli.js` (or via the npm scripts) because there's no `node_modules/.bin/coderunes` symlink pointing to ourselves. Consumers just type `coderunes` after installing.
 
