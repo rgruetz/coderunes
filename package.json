@@ -1,0 +1,75 @@
+{
+  "name": "coderunes",
+  "version": "0.0.0",
+  "description": "Generate REPO_MAP.md — a token-efficient table of contents of every file's public exports, designed for coding agents.",
+  "type": "module",
+  "bin": {
+    "coderunes": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "build:map": "node dist/cli.js",
+    "check:map": "node dist/cli.js --check",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "ci": "npm run format:check && npm run lint && npm run build && npm test && npm run check:map",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "npm run build && changeset publish",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "repo-map",
+    "code-map",
+    "ast",
+    "agent",
+    "context",
+    "ai",
+    "claude",
+    "cursor",
+    "llm"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rgruetz/coderunes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rgruetz/coderunes/issues"
+  },
+  "homepage": "https://github.com/rgruetz/coderunes#readme",
+  "dependencies": {
+    "@ast-grep/napi": "^0.42.1",
+    "fast-glob": "^3.3.3",
+    "ignore": "^7.0.5"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.31.0",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.6.0",
+    "eslint": "^10.3.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2",
+    "vitest": "^4.1.5"
+  }
+}
