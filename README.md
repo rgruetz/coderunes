@@ -139,7 +139,7 @@ Only open a file if its signatures suggest the symbol you need is there.
 
 ## Languages
 
-v0.1 supports JavaScript, TypeScript, JSX, and TSX. Parsing is powered by [`@ast-grep/napi`](https://www.npmjs.com/package/@ast-grep/napi).
+Supports JavaScript, TypeScript, JSX, and TSX. Parsing is powered by [`@ast-grep/napi`](https://www.npmjs.com/package/@ast-grep/napi).
 
 ## License
 

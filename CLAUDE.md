@@ -68,12 +68,6 @@ The package dogfoods itself — its own `REPO_MAP.md` is generated from `src/`. 
 - `coderunes.config.json` at the repo root sets `maxSignatureLength: 0` (no truncation) for this repo's own map. That's a project-local preference; defaults remain `120` and `signatureMode: "full"` for downstream consumers.
 - `test/fixtures/**` is ignored by Prettier, ESLint, and the map config — fixture files contain intentionally weird code (broken syntax, gitignored content) that linting would flag.
 
-## Branching / PRs
-
-- `main` is the trunk (kept empty until the first PR merges).
-- Feature work happens on `feat/...` branches and lands via PR to `main`.
-- Initial implementation lives on `feat/initial-implementation`.
-
 ## Releases (changesets)
 
 Versions and the changelog are managed by [changesets](https://github.com/changesets/changesets).
@@ -84,7 +78,7 @@ Versions and the changelog are managed by [changesets](https://github.com/change
 
 PR-only changes (docs, refactors with no behavior change, CI tweaks) don't need a changeset.
 
-## Open questions deferred to v0.2
+## Open questions deferred to future versions
 
 - JSON output as an alternative format (for tooling that wants structured data).
 - Per-package maps in monorepos (`packages/*/REPO_MAP.md` with a root index).

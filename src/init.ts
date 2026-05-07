@@ -8,7 +8,7 @@ import path from "node:path";
  * upstream don't silently change user behavior.
  */
 const STARTER_CONFIG = `{
-  "include": ["src/**/*.{ts,tsx,js,jsx,mjs}"],
+  "include": ["src/**/*.{ts,tsx,js,jsx,mjs,cjs}"],
   "ignore": [
     "**/node_modules/**",
     "**/dist/**",
