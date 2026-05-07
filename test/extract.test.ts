@@ -178,6 +178,32 @@ describe("extractFile", () => {
     );
   });
 
+  it("strips JSDoc from inside interface/object bodies", async () => {
+    await withTmpFile(
+      "doc.ts",
+      `export interface C {\n  /** the path */\n  path: string;\n  /** the count */\n  count: number;\n}\n`,
+      async (abs) => {
+        const out = await extractFile(abs, opts, () => {});
+        expect(out.signatures).toEqual([
+          "export interface C { path: string; count: number; }",
+        ]);
+      },
+    );
+  });
+
+  it("does not strip glob-like patterns from inside string literals", async () => {
+    await withTmpFile(
+      "globs.ts",
+      `export const PATTERNS = ["src/**/*.ts", "lib/**/*.{ts,tsx}"];\n`,
+      async (abs) => {
+        const out = await extractFile(abs, opts, () => {});
+        expect(out.signatures).toEqual([
+          'export const PATTERNS = ["src/**/*.ts", "lib/**/*.{ts,tsx}"]',
+        ]);
+      },
+    );
+  });
+
   it("extracts file summaries when enabled", async () => {
     await withTmpFile(
       "doc.ts",

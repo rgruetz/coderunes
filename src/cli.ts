@@ -6,6 +6,10 @@ import { generate } from "./generate.js";
 import { checkAgainstFile } from "./check.js";
 import { runInit } from "./init.js";
 
+/**
+ * Parsed shape of the CLI invocation. Each command maps to a single
+ * top-level branch in {@link main}.
+ */
 interface ParsedArgs {
   command: "generate" | "init" | "help" | "version";
   check: boolean;
@@ -14,6 +18,10 @@ interface ParsedArgs {
   positional: string[];
 }
 
+/**
+ * Help text shown for `--help` and on argv parsing errors. Kept in sync
+ * with the README — these are the user-facing entry points to the package.
+ */
 const HELP = `coderunes — generate REPO_MAP.md from your source files
 
 Usage
@@ -31,6 +39,11 @@ Exit codes
   2  --check found a stale or missing map
 `;
 
+/**
+ * Hand-rolled argv parser. Only ~five flags exist, so we don't pull in a
+ * CLI library; that keeps the dep tree small (and the install fast for a
+ * dev tool that gets installed in dozens of repos).
+ */
 function parseArgs(argv: string[]): ParsedArgs {
   const args: ParsedArgs = {
     command: "generate",
@@ -43,6 +56,7 @@ function parseArgs(argv: string[]): ParsedArgs {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === undefined) continue;
+
     if (a === "--help" || a === "-h") args.command = "help";
     else if (a === "--version" || a === "-v") args.command = "version";
     else if (a === "--check") args.check = true;
@@ -57,6 +71,9 @@ function parseArgs(argv: string[]): ParsedArgs {
     }
   }
 
+  // Subcommand dispatch lives outside the flag loop so argv order doesn't
+  // matter (`coderunes init --config foo.json` and `--config foo.json init`
+  // both work the same).
   const first = args.positional[0];
   if (first === "init") args.command = "init";
   else if (first !== undefined && args.command === "generate") {
@@ -66,6 +83,11 @@ function parseArgs(argv: string[]): ParsedArgs {
   return args;
 }
 
+/**
+ * Reads our own package.json `version` field so `--version` prints the
+ * installed version instead of a hard-coded string. Falls back silently
+ * if the file isn't where we expect (e.g., unusual install layouts).
+ */
 async function readPkgVersion(): Promise<string> {
   try {
     const here = path.dirname(new URL(import.meta.url).pathname);
@@ -93,6 +115,15 @@ function formatMissingHint(outPath: string): string {
   ].join("\n");
 }
 
+/**
+ * CLI entry point. Returns the process exit code rather than calling
+ * `process.exit` directly so this function can be unit-tested.
+ *
+ * Exit codes:
+ * - 0 — success (map written, check matched, init completed)
+ * - 1 — internal error (unknown flag, bad config, IO error)
+ * - 2 — `--check` found a stale or missing map
+ */
 export async function main(argv: string[]): Promise<number> {
   let args: ParsedArgs;
   try {
@@ -115,6 +146,7 @@ export async function main(argv: string[]): Promise<number> {
 
   if (args.command === "init") {
     const result = await runInit(cwd);
+
     if (result.configCreated) {
       process.stdout.write(`coderunes: created ${path.relative(cwd, result.configPath)}\n`);
     } else {
@@ -122,14 +154,17 @@ export async function main(argv: string[]): Promise<number> {
         `coderunes: ${path.relative(cwd, result.configPath)} already exists, leaving it alone\n`,
       );
     }
+
     if (result.pkgPath && result.scriptAdded) {
       process.stdout.write("coderunes: added build:map and check:map scripts to package.json\n");
     } else if (result.pkgPath) {
       process.stdout.write("coderunes: package.json scripts already present\n");
     }
+
     return 0;
   }
 
+  // Default command: generate. May write the file or just compare.
   const config = await resolveConfig({
     cwd,
     configPath: args.configPath,
@@ -137,15 +172,20 @@ export async function main(argv: string[]): Promise<number> {
   });
 
   const { content, warnings } = await generate(config);
+
+  // Surface any per-file warnings on stderr so they show up in CI logs but
+  // don't pollute the markdown content on stdout.
   for (const w of warnings) process.stderr.write(`${w}\n`);
 
   if (args.check) {
     const outcome = await checkAgainstFile(content, config);
     if (outcome.status === "match") return 0;
+
     if (outcome.status === "missing") {
       process.stderr.write(`${formatMissingHint(outcome.expectedPath)}\n`);
       return 2;
     }
+
     process.stderr.write(`${formatStaleHint(outcome.expectedPath)}\n`);
     return 2;
   }
@@ -156,6 +196,8 @@ export async function main(argv: string[]): Promise<number> {
   return 0;
 }
 
+// Only run main() when this file is the entry point. Importing as a module
+// (e.g., from tests) leaves main() unevaluated.
 const isCli = import.meta.url === `file://${process.argv[1]}`;
 if (isCli) {
   main(process.argv.slice(2))
