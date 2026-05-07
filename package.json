@@ -31,6 +31,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "ci": "npm run format:check && npm run lint && npm run build && npm test && npm run check:map",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "npm run build && changeset publish",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -59,6 +62,7 @@
     "ignore": "^7.0.5"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@eslint/js": "^10.0.1",
     "@types/node": "^25.6.0",
     "eslint": "^10.3.0",

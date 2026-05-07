@@ -74,6 +74,16 @@ The package dogfoods itself — its own `REPO_MAP.md` is generated from `src/`. 
 - Feature work happens on `feat/...` branches and lands via PR to `main`.
 - Initial implementation lives on `feat/initial-implementation`.
 
+## Releases (changesets)
+
+Versions and the changelog are managed by [changesets](https://github.com/changesets/changesets).
+
+**On every PR that changes user-facing behavior:** run `npm run changeset` and commit the generated `.changeset/*.md` file alongside your PR. Pick `patch` for bug fixes, `minor` for new features, `major` for breaking changes.
+
+**On merge to `main`:** the `release.yml` GitHub Action collects pending changesets and opens a "chore: release" PR that bumps the version + updates `CHANGELOG.md`. Merging that PR triggers `release.yml` again, which now runs `npm run release` to publish to npm with provenance. Requires `NPM_TOKEN` to be set in repo secrets.
+
+PR-only changes (docs, refactors with no behavior change, CI tweaks) don't need a changeset.
+
 ## Open questions deferred to v0.2
 
 - JSON output as an alternative format (for tooling that wants structured data).
