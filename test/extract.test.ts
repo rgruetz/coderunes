@@ -100,6 +100,25 @@ describe("extractFile", () => {
     );
   });
 
+  it("does not truncate when maxSignatureLength is 0", async () => {
+    const long = "a".repeat(200);
+    await withTmpFile(
+      "long.ts",
+      `export function fn(x: ${long}): void {}\n`,
+      async (abs) => {
+        const out = await extractFile(
+          abs,
+          { maxSignatureLength: 0, includeFileSummary: false },
+          () => {},
+        );
+        expect(out.signatures.length).toBe(1);
+        const sig = out.signatures[0]!;
+        expect(sig.endsWith("…")).toBe(false);
+        expect(sig.length).toBeGreaterThan(200);
+      },
+    );
+  });
+
   it("cuts arrow function bodies", async () => {
     await withTmpFile(
       "arrow.ts",

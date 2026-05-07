@@ -133,7 +133,10 @@ function validate(c: ResolvedConfig): void {
   if (typeof c.output !== "string" || !c.output) {
     throw new Error("config.output must be a non-empty string");
   }
-  if (typeof c.maxSignatureLength !== "number" || c.maxSignatureLength < 20) {
-    throw new Error("config.maxSignatureLength must be a number >= 20");
+  const m = c.maxSignatureLength;
+  if (typeof m !== "number" || !Number.isFinite(m) || (m !== 0 && m < 20)) {
+    throw new Error(
+      "config.maxSignatureLength must be 0 (disable truncation) or a number >= 20",
+    );
   }
 }

@@ -32,7 +32,7 @@ function findBody(node: SgNode): SgNode | null {
 
 function normalize(text: string, maxLen: number): string {
   let out = text.trim().replace(/\s+/g, " ").replace(/;\s*$/, "");
-  if (out.length > maxLen) out = out.slice(0, maxLen - 1) + "…";
+  if (maxLen > 0 && out.length > maxLen) out = out.slice(0, maxLen - 1) + "…";
   return out;
 }
 

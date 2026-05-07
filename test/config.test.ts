@@ -107,4 +107,38 @@ describe("resolveConfig", () => {
       await rm(dir, { recursive: true, force: true });
     }
   });
+
+  it("accepts maxSignatureLength of 0 to disable truncation", async () => {
+    const dir = await tmpRepo({
+      "coderunes.config.json": JSON.stringify({ maxSignatureLength: 0 }),
+    });
+    try {
+      const cfg = await resolveConfig({ cwd: dir });
+      expect(cfg.maxSignatureLength).toBe(0);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects positive maxSignatureLength below 20", async () => {
+    const dir = await tmpRepo({
+      "coderunes.config.json": JSON.stringify({ maxSignatureLength: 5 }),
+    });
+    try {
+      await expect(resolveConfig({ cwd: dir })).rejects.toThrow(/maxSignatureLength/);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects negative maxSignatureLength", async () => {
+    const dir = await tmpRepo({
+      "coderunes.config.json": JSON.stringify({ maxSignatureLength: -1 }),
+    });
+    try {
+      await expect(resolveConfig({ cwd: dir })).rejects.toThrow(/maxSignatureLength/);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
 });

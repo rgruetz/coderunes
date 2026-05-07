@@ -61,7 +61,7 @@ interface RepoMapConfig {
   include?: string[];          // globs. Default: ['src/**/*.{ts,tsx,js,jsx,mjs,cjs}']
   ignore?: string[];           // globs. Default: node_modules, dist, build, *.test.*, *.spec.*, *.d.ts
   output?: string;             // default: 'REPO_MAP.md'
-  maxSignatureLength?: number; // default: 120
+  maxSignatureLength?: number; // default: 120. Set to 0 to disable truncation.
   groupByDirectory?: boolean;  // default: false. When true, adds ## directory headers above ### file headers.
   includeFileSummary?: boolean;// default: false. Pulls top-of-file JSDoc as a one-line description.
   header?: string;             // optional custom header text prepended to the output
